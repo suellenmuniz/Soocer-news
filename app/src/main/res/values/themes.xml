@@ -2,11 +2,11 @@
     <!-- Base application theme. -->
     <style name="Theme.SoocerGirls" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/ic_launcher_girls_background</item>
+        <item name="colorPrimary">#E60D0D</item>
         <item name="colorPrimaryVariant">@color/black</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/teal_200</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/ic_launcher_girls_background</item>
+        <item name="colorSecondary">@color/purple_500</item>
         <item name="colorSecondaryVariant">@color/white</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
