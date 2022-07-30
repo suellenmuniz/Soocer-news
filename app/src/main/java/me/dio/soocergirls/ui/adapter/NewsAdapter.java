@@ -44,7 +44,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         holder.binding.tvDescription.setText(news.description);
         Picasso.get().load(news.image).fit().into(holder.binding.ivThumbnail);
         // Implementação da Funcionalidade de "abrir link":
-        holder.binding.tvOpenLink.setOnClickListener(view -> {
+        holder.binding.btOpenLink.setOnClickListener(view -> {
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(news.link));
            context.startActivity(i);

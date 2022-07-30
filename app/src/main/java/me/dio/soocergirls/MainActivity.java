@@ -7,15 +7,12 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.room.Room;
 
-import me.dio.soocergirls.data.local.AppDataBase;
 import me.dio.soocergirls.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    private AppDataBase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,16 +27,9 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
-        setupDb();
     }
 
-    private void setupDb() {
-        db = Room.databaseBuilder(this, AppDataBase.class, "Soocer news")
-                .allowMainThreadQueries()
-                .build();
+
     }
 
-    public AppDataBase getDb() {
-        return db;
-    }
-}
+

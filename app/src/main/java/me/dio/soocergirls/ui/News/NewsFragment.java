@@ -12,7 +12,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 
+import com.google.android.material.snackbar.Snackbar;
+
 import me.dio.soocergirls.MainActivity;
+import me.dio.soocergirls.R;
 import me.dio.soocergirls.data.local.AppDataBase;
 import me.dio.soocergirls.databinding.FragmentNewsBinding;
 import me.dio.soocergirls.ui.adapter.NewsAdapter;
@@ -20,46 +23,44 @@ import me.dio.soocergirls.ui.adapter.NewsAdapter;
 public class NewsFragment extends Fragment {
 
     private FragmentNewsBinding binding;
-    private AppDataBase db;
+    private NewsViewModel newsViewModel;
 
-
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        NewsViewModel newsViewModel =
-                new ViewModelProvider(this).get(NewsViewModel.class);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        newsViewModel = new ViewModelProvider(this).get(NewsViewModel.class);
 
         binding = FragmentNewsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-
-
         binding.rvNews.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        observeNews();
+        observeStates();
+
+        binding.srlNews.setOnRefreshListener(newsViewModel::findNews);
+
+        return root;
+    }
+
+    private void observeNews() {
         newsViewModel.getNews().observe(getViewLifecycleOwner(), news -> {
-            binding.rvNews.setAdapter(new NewsAdapter(news, updatedNews -> {
-                MainActivity activity = (MainActivity) getActivity();
-                if (activity != null) {
-                    activity.getDb().newsDao().save(updatedNews);
-                }
-
-            }));
-
+            binding.rvNews.setAdapter(new NewsAdapter(news, newsViewModel::saveNews));
         });
+    }
 
+    private void observeStates() {
         newsViewModel.getState().observe(getViewLifecycleOwner(), state -> {
             switch (state) {
                 case DOING:
-                    //TODO: Iniciar SaipeRefleteLayout (loanding)
+                    binding.srlNews.setRefreshing(true);
                     break;
                 case DONE:
-                    //TODO: Finalizar SaipeRefleteLayout (loanding)
+                    binding.srlNews.setRefreshing(false);
                     break;
                 case ERROR:
-                    //TODO: Finalizar SaipeRefleteLayout (loanding)
-                    //TODO: Mostra um erro generico.
-
+                    binding.srlNews.setRefreshing(false);
+                    Snackbar.make(binding.srlNews, R.string.error_network, Snackbar.LENGTH_SHORT).show();
             }
         });
-            return root;
     }
 
     @Override
@@ -68,4 +69,6 @@ public class NewsFragment extends Fragment {
         binding = null;
     }
 
+
 }
+

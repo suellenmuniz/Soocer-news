@@ -1,11 +1,16 @@
 <resources>
     <string name="app_name">Soocer Girls</string>
     <string name="title_news">News</string>
+
     <string name="title_favorites">Favorites</string>
+
     <string name="open_link">Open link</string>
+
     <string name="news_image">news image</string>
     <string name="cd_favorite_pico">favorite pico</string>
     <string name="cd_news_image">news image</string>
     <string name="cd_share_pico">share pico</string>
+
+    <string name="error_network">error_network</string>
 
 </resources>
