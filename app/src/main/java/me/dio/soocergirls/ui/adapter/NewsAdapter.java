@@ -1,8 +1,8 @@
 package me.dio.soocergirls.ui.adapter;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -10,83 +10,98 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
+import com.suellenmuniz.soocergirls.R;
+import com.suellenmuniz.soocergirls.databinding.NewsItemBinding;
 
 import java.util.List;
 
-import me.dio.soocergirls.R;
-import me.dio.soocergirls.databinding.NewsItemBinding;
+import me.dio.soocergirls.data.SoocerNewsRepository;
 import me.dio.soocergirls.domain.News;
 
-public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
+public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
 
-    private final List<News> news;
+    private final List<News> newsList;
     private final FavoriteListener favoriteListener;
 
-    public NewsAdapter(List<News> news, FavoriteListener favoriteListener) {
-        this.news = news;
+    public NewsAdapter(List<News> newsList, FavoriteListener favoriteListener) {
+        this.newsList = newsList;
         this.favoriteListener = favoriteListener;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        NewsItemBinding binding = NewsItemBinding.inflate(layoutInflater, parent, false);
-        return new ViewHolder(binding);
+    public NewsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        NewsItemBinding binding = NewsItemBinding.inflate(inflater, parent, false);
+        return new NewsViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-      Context context = holder.itemView.getContext();
+    public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
+      News news = this.newsList.get(position);
+      holder.bind(news);
 
-        News news = this.news.get(position);
-        holder.binding.tvTitle.setText(news.title);
-        holder.binding.tvDescription.setText(news.description);
-        Picasso.get().load(news.image).fit().into(holder.binding.ivThumbnail);
-        // Implementação da Funcionalidade de "abrir link":
+      // Implementação da Funcionalidade de "abrir link":
+
         holder.binding.btOpenLink.setOnClickListener(view -> {
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(news.link));
-           context.startActivity(i);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(news.link));
+            holder.binding.getRoot().getContext().startActivity(intent);
+
         });
         // Implementação da Funcionalidade de "Compartilhar":
         holder.binding.ivShare.setOnClickListener(view -> {
-            Intent i = new Intent(Intent.ACTION_SEND);
-            i.setType("text/plain");
-            i.putExtra(Intent.EXTRA_SUBJECT, news.title);
-            i.putExtra(Intent.EXTRA_TEXT, news.link);
-            holder.itemView.getContext().startActivity(Intent.createChooser(i, "Share via"));
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_SUBJECT, news.title);
+            intent.putExtra(Intent.EXTRA_TEXT, news.link);
+            holder.binding.getRoot().getContext().startActivity(
+                    Intent.createChooser(
+                            intent,
+                            "Share link using"
+                    ));
         });
         // Implementação da Funcionalidade de "Favoritar" (o evento será instanciado pelo fragment):
         holder.binding.ivFavorite.setOnClickListener(view -> {
             news.favorite = !news.favorite;
-            this.favoriteListener.onFavorite(news);
+            favoriteListener.onFavoriteClicked(news);
             notifyItemChanged(position);
         });
-        int favoriteColor = news.favorite ? R.color.favorite_active : R.color.favorite_inactive;
-        holder.binding.ivFavorite.setColorFilter(context.getResources().getColor(favoriteColor));
-    }
+        if (news.favorite) {
+            holder.binding.ivFavorite.setImageResource(R.drawable.ic_favorite_icon);
+        } else {
+            holder.binding.ivShare.setImageResource(R.drawable.ic_favorite_off);
+            AsyncTask.execute(() -> {
+                SoocerNewsRepository.getInstance().getLocalDb().newsDao().delete(news);
+            });
+        }
 
-    private Context getContext(@NonNull ViewHolder holder) {
-        return holder.itemView.getContext();
     }
 
     @Override
     public int getItemCount() {
-        return this.news.size();
+        return newsList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class NewsViewHolder extends RecyclerView.ViewHolder {
 
         private final NewsItemBinding binding;
 
-        public ViewHolder(NewsItemBinding binding) {
+        public NewsViewHolder(NewsItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
+        public void bind(News news) {
+            binding.tvTitle.setText(news.title);
+            binding.tvDescription.setText(news.description);
+            Picasso.get().load(news.image)
+                    .fit()
+                    .into(binding.ivThumbnail);
+
+        }
     }
     public interface FavoriteListener {
-        void onFavorite(News news);
+        void onFavoriteClicked(News news);
     }
 
    }

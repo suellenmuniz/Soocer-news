@@ -12,5 +12,8 @@
     <string name="cd_share_pico">share pico</string>
 
     <string name="error_network">error_network</string>
+    <string name="cd_description">Description</string>
+    <string name="share_icon">Share Icon</string>
+    <string name="ivThumbnail">News Image</string>
 
 </resources>

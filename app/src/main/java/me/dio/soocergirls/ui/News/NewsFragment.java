@@ -1,23 +1,19 @@
 package me.dio.soocergirls.ui.News;
 
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.suellenmuniz.soocergirls.R;
+import com.suellenmuniz.soocergirls.databinding.FragmentNewsBinding;
 
-import com.google.android.material.snackbar.Snackbar;
-
-import me.dio.soocergirls.MainActivity;
-import me.dio.soocergirls.R;
-import me.dio.soocergirls.data.local.AppDataBase;
-import me.dio.soocergirls.databinding.FragmentNewsBinding;
 import me.dio.soocergirls.ui.adapter.NewsAdapter;
 
 public class NewsFragment extends Fragment {
@@ -26,6 +22,7 @@ public class NewsFragment extends Fragment {
     private NewsViewModel newsViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         newsViewModel = new ViewModelProvider(this).get(NewsViewModel.class);
 
         binding = FragmentNewsBinding.inflate(inflater, container, false);
@@ -35,32 +32,41 @@ public class NewsFragment extends Fragment {
 
         observeNews();
         observeStates();
-
         binding.srlNews.setOnRefreshListener(newsViewModel::findNews);
 
         return root;
     }
 
     private void observeNews() {
-        newsViewModel.getNews().observe(getViewLifecycleOwner(), news -> {
-            binding.rvNews.setAdapter(new NewsAdapter(news, newsViewModel::saveNews));
-        });
+        newsViewModel.getNews().observe(getViewLifecycleOwner(), news ->
+            binding.rvNews.setAdapter(new NewsAdapter(news, newsViewModel::saveNews)));
+
     }
 
     private void observeStates() {
         newsViewModel.getState().observe(getViewLifecycleOwner(), state -> {
+            binding.srlNews.setColorSchemeColors(getResources().getColor(R.color.pink));
             switch (state) {
+
                 case DOING:
                     binding.srlNews.setRefreshing(true);
+
                     break;
                 case DONE:
                     binding.srlNews.setRefreshing(false);
+
                     break;
                 case ERROR:
                     binding.srlNews.setRefreshing(false);
-                    Snackbar.make(binding.srlNews, R.string.error_network, Snackbar.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Error network", Toast.LENGTH_SHORT).show();
+                    break;
             }
         });
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -69,6 +75,7 @@ public class NewsFragment extends Fragment {
         binding = null;
     }
 
+    }
 
-}
+
 

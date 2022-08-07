@@ -2,6 +2,7 @@ package me.dio.soocergirls.ui.News;
 
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -19,12 +20,11 @@ import retrofit2.Response;
 public class NewsViewModel extends ViewModel {
 
     public enum State {
-        DOING, DONE, ERROR;
+        DOING, DONE, ERROR
     }
 
     private final MutableLiveData<List<News>> news = new MutableLiveData<>();
     private final MutableLiveData<State> state = new MutableLiveData<>();
-
 
 
     public NewsViewModel() {
@@ -39,34 +39,36 @@ public class NewsViewModel extends ViewModel {
             public void onResponse(@NonNull Call<List<News>> call, @NonNull Response<List<News>> response) {
                 if (response.isSuccessful()) {
                     news.setValue(response.body());
-                    state.setValue(State.DOING);
+                    state.setValue(State.DONE);
                 } else {
                     state.setValue(State.ERROR);
+                    Log.e("NewsViewModel", "Error getting data onResponse");
                 }
             }
- 
+
             @Override
-            public void onFailure(@NonNull Call<List<News>> call, Throwable error) {
-                //FIXME Tirar o printStackTrace quando pormos para produção!!
-                error.printStackTrace();
+            public void onFailure(@NonNull Call<List<News>> call, Throwable t) {
                 state.setValue(State.ERROR);
+                Log.e("NewsViewModel", "Error getting data onFailure");
             }
         });
     }
 
-    public void saveNews(News news) {
-        AsyncTask.execute(() -> SoocerNewsRepository.getInstance().getLocalDb().newsDao().save(news));
-
-    }
-
-    public LiveData<List<News>> getNews() {
+    public MutableLiveData<List<News>> getNews() {
         return this.news;
     }
 
-    public LiveData<State> getState() {
+    public MutableLiveData<State> getState() {
         return this.state;
     }
 
+    public void saveNews(News news) {
+        AsyncTask.execute(() ->
+                SoocerNewsRepository.getInstance().getLocalDb().newsDao().save(news));
+    }
 }
+
+
+
 
 

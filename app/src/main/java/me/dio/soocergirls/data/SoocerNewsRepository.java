@@ -15,8 +15,8 @@ public class SoocerNewsRepository {
 
 
 
-    private SoocerNewsApi remoteApi;
-    private SoocerNewsDb localDb;
+    private final SoocerNewsApi remoteApi;
+    private final SoocerNewsDb localDb;
 
     public SoocerNewsApi getRemoteApi() {
         return remoteApi;

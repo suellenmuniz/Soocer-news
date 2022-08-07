@@ -16,11 +16,12 @@ public class FavoritesViewModel extends ViewModel {
     }
 
     public LiveData<List<News>> loadFavoriteNews() {
-        return SoocerNewsRepository.getInstance().getLocalDb().newsDao().loadFavoriteNews();
+        return SoocerNewsRepository.getInstance().getLocalDb().newsDao().getFavoriteNews();
 
     }
 
     public void saveNews(News news) {
-        AsyncTask.execute(() -> SoocerNewsRepository.getInstance().getLocalDb().newsDao().loadFavoriteNews());
+        AsyncTask.execute(() ->
+                SoocerNewsRepository.getInstance().getLocalDb().newsDao().save(news));
     }
 }
